@@ -1,0 +1,14 @@
+# личное и временное: в репозиторий не попадает
+solver.log
+solver.log.1
+*.bak
+__pycache__/
+*.pyc
+ScreenSolver.zip
+.env
+venv/
+.venv/
+
+# personal Russian guide, not for the repository
+ИНСТРУКЦИЯ.txt
+docs/.tmp/

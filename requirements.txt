@@ -1,0 +1,4 @@
+google-genai
+keyboard
+pyperclip
+pillow

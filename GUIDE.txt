@@ -1,0 +1,146 @@
+HIDENARM: HOW TO USE IT (guide from scratch)
+
+----------------------------------------
+1. WHAT IT IS
+----------------------------------------
+A small program that lives in the background. It has no window.
+You press a key combination and it:
+  1) takes a screenshot;
+  2) sends it to the AI (Google Gemini);
+  3) the AI finds the task or question on the screen and writes the answer;
+  4) the answer is either put into the clipboard (then you paste it with Ctrl+V), or the program types it
+     for you into the field where the text cursor is blinking, like a live person: with pauses and typos
+     that it corrects by itself.
+
+----------------------------------------
+2. FIRST LAUNCH (done once)
+----------------------------------------
+  a) Install Python 3.10 or newer from python.org (on the first screen of the installer tick
+     "Add python.exe to PATH").
+  b) Unpack the archive into any folder and double-click INSTALL.bat. It installs the required
+     libraries, asks for the key, saves it and starts the program.
+  c) A free key is available at aistudio.google.com, button "Get API key". The key is like a password:
+     do not show it to anyone.
+
+  Without INSTALL.bat, manually (in PowerShell, in the program folder):
+     pip install -r requirements.txt
+     setx GEMINI_API_KEY "YOUR_KEY"        (then sign out of Windows and sign in again)
+  and double-click start.vbs.
+
+----------------------------------------
+3. HOW TO TELL THE PROGRAM IS RUNNING
+----------------------------------------
+There is no window and no icon. That is normal. You only see a small hint in the bottom-right corner of the
+screen for a couple of seconds. To check it is running: Task Manager (Ctrl+Shift+Esc) -> process pythonw.exe.
+
+----------------------------------------
+4. EVERY DAY: TWO WAYS
+----------------------------------------
+WAY A. Answer to the clipboard  (Ctrl+Shift+X)
+  1) Open the task or question on the screen.
+  2) Point the mouse at the task or next to it. No need to click.
+  3) Press Ctrl+Shift+X.
+  4) The corner shows "…", then "✓ in clipboard". Paste the answer with Ctrl+V where you need it.
+
+WAY B. The program types the answer itself  (Ctrl+Shift+Z)
+  1) Click into the field where the answer should go (a text cursor must be blinking there).
+  2) Move the mouse back onto the task, but do NOT click (a click would take the cursor out of the field).
+  3) Press Ctrl+Shift+Z.
+  4) Wait: first "…" (the AI is thinking), then "⌨" (typing). The answer also stays in the clipboard.
+
+IMPORTANT:
+  - The program looks at the monitor where the mouse pointer is, and at the place next to the pointer.
+  - The task must be fully visible on the screen. The program cannot scroll the page.
+  - The right task is the one closest to the pointer. All other text on the screen is treated as background.
+
+----------------------------------------
+5. ALL HOTKEYS (defaults)
+----------------------------------------
+  Ctrl+Shift+X     solve, answer to the clipboard
+  Ctrl+Shift+Z     solve and type the answer
+                   (press again during typing = cancel the typing completely, the answer stays in the clipboard)
+  Alt              PAUSE while typing; press again to continue from the same place
+                   (Alt works only while typing is in progress)
+  Ctrl+Shift+F8    type FASTER (+50 characters per minute)
+  Ctrl+Shift+F7    type SLOWER (-50)
+  Ctrl+Shift+F10   open the SETTINGS WINDOW
+  Ctrl+Shift+F9    reload config.json (only needed if you edit the file by hand, not through the window)
+  Ctrl+Shift+Q     quit the program
+
+Any hotkey can be changed in the settings window (section 7).
+
+----------------------------------------
+6. WHAT THE HINTS IN THE CORNER MEAN
+----------------------------------------
+  …                    the AI is thinking, wait
+  ↻ 2/3                network or server problem, the program is trying again
+  ✓ in clipboard       done, the answer is in the clipboard, paste it with Ctrl+V
+  ⌨                    typing in progress
+  ⏸ paused             typing is paused (Alt to continue)
+  ✓                    everything was typed
+  ■ stopped (...)      typing was cancelled, the answer is in the clipboard
+  ? task not found     the AI did not see a task: move the pointer closer to it and press again
+  ⚡ 300 chars/min      new typing speed
+  ✓ settings saved
+  ✗ ...                an error, the reason is written next to it (see section 9)
+
+----------------------------------------
+7. SETTINGS WINDOW (Ctrl+Shift+F10)
+----------------------------------------
+The only moment the program is visible is while this window is open. Close it and the program is
+windowless again. While the window is open the program's hotkeys do not work (that is intended, otherwise
+a new hotkey could not be recorded).
+
+"General" tab:
+  - Typing speed. A slider or the buttons "Slow / Like a normal person / Fast".
+    This is the real speed in characters per minute, pauses and typos included. A normal person types 200-400.
+    Want exactly 250? Move the slider to 250 and press "Save".
+  - Typos. 0 = type without a single mistake.
+  - New line. For chats (Telegram, WhatsApp, Discord) pick "Shift+Enter", otherwise Enter would send the
+    message after the very first line.
+  - Area near cursor. A zoomed piece of the screen around the pointer so the AI sees small text better.
+    For long tasks pick "Large".
+  - Gemini model. Do not touch it without a reason.
+  - Code without comments, and your own rules for the AI: see section 8.
+
+"Hotkeys" tab: click "Change" next to the action you want, then press the new combination on the keyboard.
+Esc = cancel. Every action must have its own combination. Better to use Ctrl+Shift+something or F-keys.
+
+At the bottom: "Save" applies everything at once, "Cancel" closes the window without changing anything.
+
+----------------------------------------
+8. HOW TO GET THE ANSWER YOU WANT
+----------------------------------------
+  - The AI takes the requirements from the text of the task and follows them strictly: language, method,
+    prohibitions, function names. If the task says "in Python, with recursion, no loops", that is what you get.
+  - If the task does not name a language, the AI looks for hints on the screen (code samples, a file name),
+    otherwise it uses Python.
+  - Code is always written as simply as possible, without unnecessary extras.
+  - Code WITHOUT COMMENTS: no #, //, /* */ or docstrings. On by default. Turn it off with the
+    "Code without comments" checkbox in the settings window ("General").
+  - Your own permanent rules: settings window -> "General" -> the field at the bottom. Examples:
+        English variable names
+        answer no longer than 10 lines
+    They are added to every request.
+  - If the AI solved the wrong task: put the pointer right on the task you want and press the hotkey again.
+  - ALWAYS check the answer yourself before using it. The AI can be wrong.
+
+----------------------------------------
+9. IF SOMETHING GOES WRONG
+----------------------------------------
+  Nothing happens when you press a hotkey
+     -> the program is not running (start start.vbs), or the settings window is open (close it),
+        or the hotkey is taken by another program (change it in the settings window).
+  "✗ check API key"
+     -> the key is missing or wrong. Repeat step "b" from section 2 and sign in to Windows again.
+  "✗ no network"             -> check your internet connection.
+  "✗ rate limit"             -> you press too often, wait a minute.
+  "✗ server overloaded"      -> the AI has many requests. The program retries 3 times by itself, then press again.
+  "? task not found"         -> move the pointer closer to the task. Or in settings "Area near cursor" -> "Large".
+  It types in the wrong place -> typing goes to the window where the text cursor is blinking. Click the right
+                              field BEFORE pressing Ctrl+Shift+Z.
+  It types too fast or too slow -> Ctrl+Shift+F7 / F8 or the settings window.
+  Typing is going and you need to stop it -> Alt (pause) or Ctrl+Shift+Z again (cancel).
+  All errors with details are written to the solver.log file next to the program.
+
+To quit the program completely: Ctrl+Shift+Q.

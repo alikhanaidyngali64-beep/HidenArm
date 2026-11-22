@@ -1,0 +1,29 @@
+{
+  "api_key": "",
+  "model": "gemini-3.5-flash-lite",
+  "hotkey_solve": "ctrl+shift+x",
+  "hotkey_quit": "ctrl+shift+q",
+  "hotkey_type": "ctrl+shift+z",
+  "hotkey_pause": "alt",
+  "hotkey_speed_up": "ctrl+shift+f8",
+  "hotkey_speed_down": "ctrl+shift+f7",
+  "hotkey_reload": "ctrl+shift+f9",
+  "speed_step": 50,
+  "cursor_aware": true,
+  "cursor_crop": [
+    1100,
+    700
+  ],
+  "typing": {
+    "speed": 900,
+    "typo_rate": 0.035,
+    "think_chance": 0.02,
+    "newline_key": "enter"
+  },
+  "show_toast": true,
+  "toast_seconds": 2,
+  "extra_rules": "",
+  "timeout_seconds": 60,
+  "hotkey_settings": "ctrl+shift+f10",
+  "no_comments": true
+}
