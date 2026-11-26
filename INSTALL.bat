@@ -31,8 +31,9 @@ wscript "%~dp0start.vbs"
 echo.
 echo DONE. The program runs in the background and has no window.
 echo.
-echo    Ctrl+Shift+X     solve the task, answer to the clipboard
-echo    Ctrl+Shift+Z     solve and type the answer
+echo    Ctrl+Shift+X     screenshot, solve, answer to the clipboard
+echo    Ctrl+Shift+F6    task text from the clipboard, answer to the clipboard
+echo    Ctrl+Shift+Z     type the clipboard text like a human
 echo    Ctrl+Shift+F10   settings and the full guide
 echo    Ctrl+Shift+Q     quit the program
 echo.

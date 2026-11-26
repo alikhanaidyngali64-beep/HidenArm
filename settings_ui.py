@@ -17,7 +17,8 @@ GUIDE_PATH = Path(__file__).resolve().parent / "GUIDE.txt"
 
 HOTKEY_ROWS = [
     ("hotkey_solve", "Solve, answer to clipboard"),
-    ("hotkey_type", "Solve and type the answer"),
+    ("hotkey_type", "Type the clipboard text like a human"),
+    ("hotkey_clipboard", "Task from clipboard, answer to clipboard"),
     ("hotkey_pause", "Pause / resume typing"),
     ("hotkey_speed_down", "Type slower"),
     ("hotkey_speed_up", "Type faster"),

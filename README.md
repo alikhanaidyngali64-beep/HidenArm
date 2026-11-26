@@ -39,14 +39,16 @@ Then sign out of Windows, sign in again and run `start.vbs`.
 
 1. Point the mouse at the task (no need to click).
 2. Press **Ctrl+Shift+X**: the answer lands in the clipboard, paste it with Ctrl+V.
-3. Or click into the answer field, move the mouse back to the task and press **Ctrl+Shift+Z**: the answer is typed for you.
+3. Or copy the task text (Ctrl+C) and press **Ctrl+Shift+F6**: no screenshot, the task is read from the clipboard and the answer replaces it there.
+4. Click into the answer field and press **Ctrl+Shift+Z**: whatever is in the clipboard is typed for you like a human (no AI involved).
 
 ## Hotkeys (defaults)
 
 | Keys | Action |
 |---|---|
 | Ctrl+Shift+X | solve, answer to the clipboard |
-| Ctrl+Shift+Z | solve and type the answer (press again to cancel typing) |
+| Ctrl+Shift+F6 | task text from the clipboard (no screenshot), answer to the clipboard |
+| Ctrl+Shift+Z | type the clipboard text like a human (press again to cancel typing) |
 | Alt | pause / resume typing |
 | Ctrl+Shift+F8 / F7 | type faster / slower |
 | Ctrl+Shift+F10 | settings window and guide |

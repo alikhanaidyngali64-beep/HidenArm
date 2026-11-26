@@ -15,15 +15,16 @@
     700
   ],
   "typing": {
-    "speed": 900,
+    "speed": 850,
     "typo_rate": 0.035,
     "think_chance": 0.02,
     "newline_key": "enter"
   },
   "show_toast": true,
   "toast_seconds": 2,
-  "extra_rules": "",
+  "extra_rules": "Пиши ответы без комментариев, и по запросу только",
   "timeout_seconds": 60,
   "hotkey_settings": "ctrl+shift+f10",
-  "no_comments": true
+  "no_comments": true,
+  "hotkey_clipboard": "ctrl+shift+f6"
 }

@@ -10,8 +10,10 @@ that is closest to the cursor.
 
 Hotkeys (all of them can be changed in the settings window or in config.json):
   ctrl+shift+x   - screenshot, solve, copy the answer to the clipboard
-  ctrl+shift+z   - same, but the answer is also typed into the focused window like a human
-                   (smooth pace, typos that get corrected). Pressing it again while typing
+  ctrl+shift+f6  - NO screenshot: copy the task text (Ctrl+C), press this, the task is read from the
+                   clipboard, sent to the model as text and the answer is put back into the clipboard
+  ctrl+shift+z   - types WHATEVER IS IN THE CLIPBOARD into the focused window like a human (smooth pace,
+                   typos that get corrected). No screenshot, no model. Pressing it again while typing
                    cancels the typing completely.
   alt            - PAUSE typing; press again to continue from the same place
                    (Alt is only claimed while typing is in progress and is not passed to the window)
@@ -67,7 +69,41 @@ NO_COMMENTS_RULE = (
     "-- and no explanatory lines, no docstrings and no triple-quoted strings acting as comments. Only the code "
     "itself. (Directives such as #include, #define, a shebang and the like are not comments, keep them.)"
 )
+NO_TASK_RULE_CLIPBOARD = (
+    "The user copied this text on purpose, so ALL of it is the task, even if it is short, is only a fragment, "
+    "has no question mark, or lacks context. Never refuse and never say that there is no task: "
+    "do what the text asks, or answer it as a question; if it is a multiple-choice question give the "
+    "correct option; if it is unclear, give your best answer.\n\n"
+)
+CLIPBOARD_MARK_BEGIN = "=== TASK TEXT START ==="
+CLIPBOARD_MARK_END = "=== TASK TEXT END ==="
+CLIPBOARD_MAX_CHARS = 30000  # a copied text longer than this is cut: it is surely not a single task
 RETRY_CODES = {429, 500, 502, 503, 504}
+
+# Conditions shared by the screenshot prompt and the clipboard prompt
+SOLVE_RULES = (
+    "STRICTLY follow every condition of the task, without changing or inventing anything:\n"
+    "- Programming language: only the one named in the task. If none is named, use the language "
+    "of the code samples, the file name or the editor window; if that is unclear too, use Python.\n"
+    "- Method: if recursion, a specific algorithm, data structure, class or pattern is required, "
+    "do it exactly that way and not another.\n"
+    "- Prohibitions: if a loop, built-in function, library, operator, array, slice, etc. must not be "
+    "used, do not use it in any form, including hidden ones. For example, when recursion is required "
+    "there must be no for, no while, no range, no map/reduce, no generators or comprehensions, and "
+    "no equivalents in another syntax.\n"
+    "- Take function, class and variable names, signatures and the input/output format exactly "
+    "as written in the task.\n"
+    "- Follow the constraints (complexity, memory, line count, language version, style).\n"
+    "- Write the simplest and shortest code, understandable for a beginner: the simplest constructs "
+    "and clear names, without unnecessary abstractions, classes, decorators, type annotations, error "
+    "handling or optimizations unless the task requires them. But simplicity is never a reason to "
+    "break the conditions above: requirements first, simplicity second.\n"
+    "- Do not add anything that was not asked for: if a function is requested give only the function; "
+    "if a whole program is requested give the complete program; no tests or usage examples unless "
+    "requested.\n"
+    "Before answering, mentally check the solution against each condition in turn and fix any "
+    "violation.\n"
+)
 
 DEFAULT_CONFIG = {
     "api_key": "",  # better not to store it here: set the GEMINI_API_KEY environment variable instead
@@ -78,7 +114,8 @@ DEFAULT_CONFIG = {
     "max_image_side": 1920,  # longest side of the screenshot, px (0 = do not downscale)
     "hotkey_solve": "ctrl+shift+x",
     "hotkey_quit": "ctrl+shift+q",
-    "hotkey_type": "ctrl+shift+z",
+    "hotkey_type": "ctrl+shift+z",           # type the clipboard text like a human
+    "hotkey_clipboard": "ctrl+shift+f6",     # task text from the clipboard (no screenshot) -> answer to the clipboard
     "hotkey_pause": "alt",  # pause / resume typing; only active while typing and not passed to the window
     "hotkey_speed_up": "ctrl+shift+f8",      # type faster (by speed_step), works during typing too
     "hotkey_speed_down": "ctrl+shift+f7",    # type slower
@@ -92,29 +129,18 @@ DEFAULT_CONFIG = {
     "prompt": (
         "The screenshot shows a task or a question (for example a programming assignment "
         "or a message in a messenger). Find it and solve it.\n"
-        "STRICTLY follow every condition of the task, without changing or inventing anything:\n"
-        "- Programming language: only the one named in the task. If none is named, use the language "
-        "of the code samples, the file name or the editor window; if that is unclear too, use Python.\n"
-        "- Method: if recursion, a specific algorithm, data structure, class or pattern is required, "
-        "do it exactly that way and not another.\n"
-        "- Prohibitions: if a loop, built-in function, library, operator, array, slice, etc. must not be "
-        "used, do not use it in any form, including hidden ones. For example, when recursion is required "
-        "there must be no for, no while, no range, no map/reduce, no generators or comprehensions, and "
-        "no equivalents in another syntax.\n"
-        "- Take function, class and variable names, signatures and the input/output format exactly "
-        "as written in the task.\n"
-        "- Follow the constraints (complexity, memory, line count, language version, style).\n"
-        "- Write the simplest and shortest code, understandable for a beginner: the simplest constructs "
-        "and clear names, without unnecessary abstractions, classes, decorators, type annotations, error "
-        "handling or optimizations unless the task requires them. But simplicity is never a reason to "
-        "break the conditions above: requirements first, simplicity second.\n"
-        "- Do not add anything that was not asked for: if a function is requested give only the function; "
-        "if a whole program is requested give the complete program; no tests or usage examples unless "
-        "requested.\n"
-        "Before answering, mentally check the solution against each condition in turn and fix any "
-        "violation.\n"
+        + SOLVE_RULES +
         "Reply only with the finished solution/answer, with no preamble and no description of the "
         "screenshot. Write text answers in the language of the task. "
+        "Use plain text: no LaTeX, no $ signs and no markdown."
+    ),
+    # used by the clipboard hotkey: the task arrives as text, there is no screenshot
+    "prompt_clipboard": (
+        "Below, between the markers, is the text of a task or a question that the user copied "
+        "(for example a programming assignment, a test question or a message in a messenger). Solve it.\n"
+        + SOLVE_RULES +
+        "Reply only with the finished solution/answer, with no preamble and no repeating of the task. "
+        "Write text answers in the language of the task. "
         "Use plain text: no LaTeX, no $ signs and no markdown."
     ),
     "no_comments": True,  # True = the AI writes code without a single comment (#, //, /* */, docstring)
@@ -337,6 +363,18 @@ def copy_to_clipboard(text: str, attempts: int = 20) -> None:
             time.sleep(0.1)
 
 
+def read_clipboard(attempts: int = 20) -> str:
+    """Text from the clipboard ('' if it holds no text, e.g. an image). Retries while another program holds it."""
+    for i in range(attempts):
+        try:
+            return pyperclip.paste() or ""
+        except pyperclip.PyperclipException:
+            if i == attempts - 1:
+                raise
+            time.sleep(0.1)
+    return ""
+
+
 def load_config() -> dict:
     cfg = json.loads(json.dumps(DEFAULT_CONFIG))  # deep copy
     if CONFIG_PATH.exists():
@@ -382,6 +420,7 @@ class App:
             keyboard.parse_hotkey(cfg["hotkey_pause"])  # the pause key is only hooked while typing: validate it up front
             handles.append(keyboard.add_hotkey(cfg["hotkey_solve"], self.on_solve))
             handles.append(keyboard.add_hotkey(cfg["hotkey_type"], self.on_type))
+            handles.append(keyboard.add_hotkey(cfg["hotkey_clipboard"], self.on_clipboard))
             handles.append(keyboard.add_hotkey(cfg["hotkey_quit"], self.on_quit))
             # No suppress: with it the keyboard library broke neighbouring hotkeys. That is why speed and reload
             # use F-keys (Ctrl+Shift+F7/F8/F9): they do nothing in the window we type into.
@@ -581,13 +620,21 @@ class App:
         self.ui_queue.put(("quit", ""))
 
     def on_solve(self):
-        self._start(type_it=False)
+        self._start(from_clipboard=False)
 
     def on_type(self):
-        if self.typing_now:  # pressing the hotkey again during typing = cancel completely
+        """Types what is in the clipboard. Pressing it again during typing = cancel completely."""
+        if self.typing_now:
             self.abort_typing.set()
             return
-        self._start(type_it=True)
+        if not self.busy.acquire(blocking=False):
+            return  # a screenshot / clipboard task is being solved right now
+        threading.Thread(target=self.type_clipboard, daemon=True).start()
+
+    def on_clipboard(self):
+        if self.typing_now:  # do not start anything while the clipboard is being typed
+            return
+        self._start(from_clipboard=True)
 
     def on_pause(self):
         """Pause / resume: typing stops at the current character and later continues from it."""
@@ -635,10 +682,10 @@ class App:
                 return False
             self.abort_typing.wait(min(remaining, 0.05))
 
-    def _start(self, type_it: bool):
+    def _start(self, from_clipboard: bool = False):
         if not self.busy.acquire(blocking=False):
-            return  # the previous screenshot is still being solved
-        threading.Thread(target=self.solve, args=(type_it,), daemon=True).start()
+            return  # the previous task is still being solved
+        threading.Thread(target=self.solve, args=(from_clipboard,), daemon=True).start()
 
     def ask_model(self, contents: list):
         """Request to Gemini with retries: 429/5xx and network errors -> wait and try again; 404 -> next model."""
@@ -668,32 +715,65 @@ class App:
         assert last_error is not None
         raise last_error
 
-    def solve(self, type_it: bool = False):
+    def build_request(self, from_clipboard: bool) -> "list | None":
+        """Contents for the model. None = the clipboard has no text (the toast is already queued)."""
+        rules = [self.cfg["extra_rules"].strip()]
+        if self.cfg["no_comments"]:
+            rules.append(NO_COMMENTS_RULE)
+        extra = "\n".join(r for r in rules if r)
+        extra = ("\n" + extra) if extra else ""
+        if not from_clipboard:
+            images, hint = grab_screen(self.cfg)
+            return [*images, self.cfg["prompt"] + extra + "\n\n" + NO_TASK_RULE + hint]
+        task = read_clipboard().strip()
+        if not task:
+            log("CLIPBOARD: no text in the clipboard")
+            self.ui_queue.put(("warn", "? clipboard has no text"))
+            return None
+        log("CLIPBOARD: task text: " + task[:150].replace("\n", " "))
+        if len(task) > CLIPBOARD_MAX_CHARS:
+            log(f"WARN: clipboard text is {len(task)} chars, cut to {CLIPBOARD_MAX_CHARS}")
+            task = task[:CLIPBOARD_MAX_CHARS]
+        return [self.cfg["prompt_clipboard"] + extra + "\n\n" + NO_TASK_RULE_CLIPBOARD
+                + f"{CLIPBOARD_MARK_BEGIN}\n{task}\n{CLIPBOARD_MARK_END}"]
+
+    def solve(self, from_clipboard: bool = False):
+        """Screenshot (or clipboard text) -> model -> answer into the clipboard."""
         try:
             self.ui_queue.put(("busy", "…"))
-            images, hint = grab_screen(self.cfg)
-            rules = [self.cfg["extra_rules"].strip()]
-            if self.cfg["no_comments"]:
-                rules.append(NO_COMMENTS_RULE)
-            extra = "\n".join(r for r in rules if r)
-            prompt = self.cfg["prompt"] + ("\n" + extra if extra else "") + "\n\n" + NO_TASK_RULE + hint
-            resp = self.ask_model([*images, prompt])
+            contents = self.build_request(from_clipboard)
+            if contents is None:
+                return
+            resp = self.ask_model(contents)
             answer = plain_for_typing((resp.text or "").strip())
             if not answer:
                 raise RuntimeError("empty response from the model")
             if is_no_task(answer):
-                log("NO_TASK: no task on the screen")
+                log(f"NO_TASK: no task found ({'clipboard' if from_clipboard else 'screenshot'})")
                 self.ui_queue.put(("warn", "? task not found"))
                 return
-            copy_to_clipboard(answer)  # also when typing: a fallback in case the typing is interrupted
+            copy_to_clipboard(answer)
             log("OK: " + answer[:200].replace("\n", " "))
-            if type_it:
-                self.type_answer(answer)
-            else:
-                self.ui_queue.put(("ok", "✓ in clipboard"))
+            self.ui_queue.put(("ok", "✓ in clipboard"))
         except Exception as e:  # noqa: BLE001
             log(f"ERROR: {e!r}")
             self.ui_queue.put(("err", f"✗ {explain_error(e)} (solver.log)"))
+        finally:
+            self.busy.release()
+
+    def type_clipboard(self):
+        """Types the clipboard text into the focused window like a human (no screenshot, no model)."""
+        try:
+            text = read_clipboard().replace("\r\n", "\n").replace("\r", "\n").strip("\n").rstrip()
+            if not text:
+                log("TYPE: no text in the clipboard")
+                self.ui_queue.put(("warn", "? clipboard has no text"))
+                return
+            log(f"TYPE: {len(text)} chars from the clipboard: " + text[:100].replace("\n", " "))
+            self.type_answer(text)
+        except Exception as e:  # noqa: BLE001
+            log(f"ERROR: typing the clipboard failed: {e!r}")
+            self.ui_queue.put(("err", "✗ typing failed (solver.log)"))
         finally:
             self.typing_now = False
             self.busy.release()
@@ -735,7 +815,7 @@ class App:
         if done:
             self.ui_queue.put(("ok", "✓"))
         else:
-            self.ui_queue.put(("err", "■ stopped (answer is in the clipboard)"))
+            self.ui_queue.put(("err", "■ stopped"))
 
     def run(self):
         self.root.mainloop()

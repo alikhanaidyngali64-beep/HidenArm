@@ -34,7 +34,7 @@ There is no window and no icon. That is normal. You only see a small hint in the
 screen for a couple of seconds. To check it is running: Task Manager (Ctrl+Shift+Esc) -> process pythonw.exe.
 
 ----------------------------------------
-4. EVERY DAY: TWO WAYS
+4. EVERY DAY: THREE WAYS
 ----------------------------------------
 WAY A. Answer to the clipboard  (Ctrl+Shift+X)
   1) Open the task or question on the screen.
@@ -42,11 +42,20 @@ WAY A. Answer to the clipboard  (Ctrl+Shift+X)
   3) Press Ctrl+Shift+X.
   4) The corner shows "…", then "✓ in clipboard". Paste the answer with Ctrl+V where you need it.
 
-WAY B. The program types the answer itself  (Ctrl+Shift+Z)
-  1) Click into the field where the answer should go (a text cursor must be blinking there).
-  2) Move the mouse back onto the task, but do NOT click (a click would take the cursor out of the field).
-  3) Press Ctrl+Shift+Z.
-  4) Wait: first "…" (the AI is thinking), then "⌨" (typing). The answer also stays in the clipboard.
+WAY B. Task from the clipboard, no screenshot  (Ctrl+Shift+F6)
+  1) Select the text of the task anywhere and copy it with Ctrl+C.
+  2) Press Ctrl+Shift+F6.
+  3) The corner shows "…", then "✓ in clipboard". The answer has REPLACED the copied task in the clipboard.
+  If the clipboard has no text (for example it holds a picture), the corner shows "? clipboard has no text".
+
+WAY C. The program types the clipboard text itself  (Ctrl+Shift+Z)
+  This is the second step after way A or B: the answer is already in the clipboard.
+  1) Click into the field where the text should go (a text cursor must be blinking there).
+  2) Press Ctrl+Shift+Z.
+  3) The corner shows "⌨" and the program types the clipboard text like a human (pace, pauses, typos that
+     get corrected). Nothing is sent to the AI at this step: it types exactly what is in the clipboard,
+     so it works for any text you copied, not only for answers.
+  Stop: Alt = pause / continue, Ctrl+Shift+Z again = cancel.
 
 IMPORTANT:
   - The program looks at the monitor where the mouse pointer is, and at the place next to the pointer.
@@ -57,8 +66,9 @@ IMPORTANT:
 5. ALL HOTKEYS (defaults)
 ----------------------------------------
   Ctrl+Shift+X     solve, answer to the clipboard
-  Ctrl+Shift+Z     solve and type the answer
-                   (press again during typing = cancel the typing completely, the answer stays in the clipboard)
+  Ctrl+Shift+F6    take the task text from the clipboard, answer to the clipboard (no screenshot)
+  Ctrl+Shift+Z     TYPE the clipboard text like a human (no AI, no screenshot)
+                   (press again during typing = cancel the typing completely)
   Alt              PAUSE while typing; press again to continue from the same place
                    (Alt works only while typing is in progress)
   Ctrl+Shift+F8    type FASTER (+50 characters per minute)
@@ -78,7 +88,8 @@ Any hotkey can be changed in the settings window (section 7).
   ⌨                    typing in progress
   ⏸ paused             typing is paused (Alt to continue)
   ✓                    everything was typed
-  ■ stopped (...)      typing was cancelled, the answer is in the clipboard
+  ■ stopped            typing was cancelled (the text is still in the clipboard)
+  ? clipboard has no text   the clipboard is empty or holds a picture
   ? task not found     the AI did not see a task: move the pointer closer to it and press again
   ⚡ 300 chars/min      new typing speed
   ✓ settings saved
